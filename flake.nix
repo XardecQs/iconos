@@ -14,6 +14,18 @@
         nixpkgs.lib.filterAttrs (_: type: type == "directory") (builtins.readDir ./src)
       );
 
+      resolveDeps =
+        pkgs: name:
+        {
+          "definitivo" = [
+            pkgs.papirus-icon-theme
+            pkgs.adwaita-icon-theme
+            pkgs.hicolor-icon-theme
+          ];
+          "macos-tahoe-cursor" = [ pkgs.hicolor-icon-theme ];
+        }
+        .${name} or [ ];
+
       mkThemePkg =
         pkgs: name:
         pkgs.stdenvNoCC.mkDerivation {
@@ -21,12 +33,14 @@
           version = "1.0";
           src = ./src + "/${name}";
           nativeBuildInputs = [ pkgs.gtk3 ];
+          propagatedBuildInputs = resolveDeps pkgs name;
           dontDropIconThemeCache = true;
           installPhase = ''
             mkdir -p $out/share/icons
             cp -r . $out/share/icons/${name}
             if [ -f $out/share/icons/${name}/index.theme ]; then
-              ${pkgs.gtk3}/bin/gtk-update-icon-cache --include-image-data $out/share/icons/${name}
+              ${pkgs.gtk3}/bin/gtk-update-icon-cache \
+                --include-image-data $out/share/icons/${name}
             fi
           '';
           meta = with pkgs.lib; {
