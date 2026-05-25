@@ -35,6 +35,7 @@
           nativeBuildInputs = [ pkgs.gtk3 ];
           propagatedBuildInputs = resolveDeps pkgs name;
           dontDropIconThemeCache = true;
+          dontWrapQtApps = true;
           installPhase = ''
             mkdir -p $out/share/icons
             cp -r . $out/share/icons/${name}
