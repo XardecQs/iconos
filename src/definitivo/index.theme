@@ -7,24 +7,38 @@ FollowsColorScheme=true
 
 Directories=places/scalable,places/symbolic,apps/scalable
 
+[places/scalable]
+Context=Places
+Size=128
+MinSize=16
+MaxSize=512
+Type=Scalable
+
 [places/symbolic]
 Context=Places
 Size=16
 MinSize=8
-MaxSize=22
-Type=Fixed
-
-[places/scalable]
-Context=Places
-Size=128
-MinSize=32
-MaxSize=512
+MaxSize=32
 Type=Scalable
 
 [apps/scalable]
 Context=Apps
 Size=128
-MinSize=32
+MinSize=16
 MaxSize=512
 Type=Scalable
 
+[16x16@2]
+Size=32
+Type=Scalable
+Context=Places
+
+[32x32]
+Size=32
+Type=Fixed
+Context=Places
+
+[48x48]
+Size=48
+Type=Fixed
+Context=Places
