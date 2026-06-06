@@ -9,8 +9,8 @@ Directories=places/scalable,places/symbolic,apps/scalable
 
 [places/scalable]
 Context=Places
-Size=128
-MinSize=16
+Size=64
+MinSize=32
 MaxSize=512
 Type=Scalable
 
