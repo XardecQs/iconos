@@ -97,7 +97,7 @@
         { pkgs, ... }:
         {
           environment.systemPackages = builtins.attrValues (mkSystemPackages pkgs.system);
-          gtk.iconCache = true;
+          gtk.iconCache.enable = true;
         };
     };
 }
