@@ -6,7 +6,7 @@
   };
 
   outputs =
-    { self, nixpkgs }:
+    { nixpkgs }:
     let
       forEachSystem = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
 
@@ -32,19 +32,35 @@
           pname = name;
           version = "1.0";
           src = ./src + "/${name}";
-          nativeBuildInputs = [ pkgs.gtk3 ];
+
+          nativeBuildInputs = [
+            pkgs.gtk3
+            pkgs.gtk4
+          ];
           propagatedBuildInputs = resolveDeps pkgs name;
+
           dontDropIconThemeCache = true;
           dontWrapQtApps = true;
+          dontPatchShebangs = true;
+
           installPhase = ''
-            mkdir -p $out/share/icons
+            runHook preInstall
+
+            mkdir -p $out/share/icons/${name}
             cp -r . $out/share/icons/${name}
-            if [ -f $out/share/icons/${name}/index.theme ]; then
-              ${pkgs.gtk3}/bin/gtk-update-icon-cache \
-                --include-image-data $out/share/icons/${name}
-            fi
+
+            # Aseguramos que index.theme exista y tenga permisos correctos
+            chmod 644 $out/share/icons/${name}/index.theme 2>/dev/null || true
+
+            # Actualizamos caché (GTK3 y GTK4)
+            ${pkgs.gtk3}/bin/gtk-update-icon-cache --force --include-image-data $out/share/icons/${name}
+            ${pkgs.gtk4}/bin/gtk4-update-icon-cache --force $out/share/icons/${name} 2>/dev/null || true
+
+            runHook postInstall
           '';
+
           meta = with pkgs.lib; {
+            description = "Tema de iconos ${name}";
             license = licenses.unfree;
             platforms = platforms.all;
           };
@@ -79,19 +95,9 @@
 
       nixosModules.default =
         { pkgs, ... }:
-        let
-          themePkgs = builtins.listToAttrs (
-            map (name: {
-              inherit name;
-              value = mkThemePkg (import nixpkgs {
-                inherit (pkgs.stdenv.hostPlatform) system;
-                config.allowUnfree = true;
-              }) name;
-            }) themeDirs
-          );
-        in
         {
-          environment.systemPackages = builtins.attrValues themePkgs;
+          environment.systemPackages = builtins.attrValues (mkSystemPackages pkgs.system);
+          gtk.iconCache = true;
         };
     };
 }
