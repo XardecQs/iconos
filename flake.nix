@@ -95,8 +95,19 @@
 
       nixosModules.default =
         { pkgs, ... }:
+        let
+          themePkgs = builtins.listToAttrs (
+            map (name: {
+              inherit name;
+              value = mkThemePkg (import nixpkgs {
+                inherit (pkgs.stdenv.hostPlatform) system;
+                config.allowUnfree = true;
+              }) name;
+            }) themeDirs
+          );
+        in
         {
-          environment.systemPackages = builtins.attrValues (mkSystemPackages pkgs.system);
+          environment.systemPackages = builtins.attrValues themePkgs;
           gtk.iconCache.enable = true;
         };
     };
