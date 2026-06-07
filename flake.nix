@@ -6,7 +6,7 @@
   };
 
   outputs =
-    { nixpkgs }:
+    { self, nixpkgs }:
     let
       forEachSystem = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
 
