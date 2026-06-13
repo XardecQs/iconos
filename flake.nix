@@ -99,10 +99,7 @@
           themePkgs = builtins.listToAttrs (
             map (name: {
               inherit name;
-              value = mkThemePkg (import nixpkgs {
-                inherit (pkgs.stdenv.hostPlatform) system;
-                config.allowUnfree = true;
-              }) name;
+              value = mkThemePkg pkgs name;
             }) themeDirs
           );
         in
